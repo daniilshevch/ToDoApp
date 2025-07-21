@@ -8,14 +8,14 @@ namespace ToDoApp.Application.Tasks.Handlers
 {
     public class GetAllTaskQueryHandler: IRequestHandler<GetAllTasksQuery, List<TaskItem>>
     {
-        private readonly IAppDbContext _context;
-        public GetAllTaskQueryHandler(IAppDbContext context)
+        private readonly ITaskRepository _repository;
+        public GetAllTaskQueryHandler(ITaskRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<List<TaskItem>> Handle(GetAllTasksQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Tasks.ToListAsync();
+            return await _repository.GetAllAsync();
         }
     }
 }

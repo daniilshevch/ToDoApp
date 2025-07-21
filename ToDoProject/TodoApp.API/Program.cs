@@ -29,6 +29,7 @@ class Server
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));  
         services.AddDbContext<AppDbContext>((DbContextOptionsBuilder options) => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
         services.AddScoped<IAppDbContext>((IServiceProvider provider) => provider.GetRequiredService<AppDbContext>());
+        services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddMediatR((MediatRServiceConfiguration mediatorConfiguration) => mediatorConfiguration.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly));
         services.AddCors((CorsOptions options) =>
         {

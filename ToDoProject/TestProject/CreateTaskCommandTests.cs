@@ -11,17 +11,14 @@ namespace TestProject
 {
     public class CreateTaskCommandTests
     {
-        private readonly Mock<DbSet<TaskItem>> mockDbSet;
-        private readonly Mock<IAppDbContext> mockDbContext;
+        private readonly Mock<ITaskRepository> mockRepository;
         private readonly CreateTaskCommandHandler handler;
         public CreateTaskCommandTests()
         {
-            mockDbSet = new Mock<DbSet<TaskItem>>();
-            mockDbContext = new Mock<IAppDbContext>();
-            mockDbContext.Setup(context => context.Tasks).Returns(mockDbSet.Object);
-            mockDbContext.Setup(context => context.Tasks.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>())).Returns(null!);
-            mockDbContext.Setup(context => context.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-            handler = new CreateTaskCommandHandler(mockDbContext.Object);
+            mockRepository = new Mock<ITaskRepository>();
+            mockRepository.Setup(repository => repository.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            mockRepository.Setup(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+            handler = new CreateTaskCommandHandler(mockRepository.Object);
         }
         [Fact]
 
@@ -40,8 +37,8 @@ namespace TestProject
             Assert.Equal("This is a test task", result.Description);
             Assert.Equal(TaskProgressStatus.ToDo, result.Status);
 
-            mockDbContext.Verify(c => c.Tasks.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
-            mockDbContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 
         }
         [Fact]
@@ -54,8 +51,8 @@ namespace TestProject
             };
             TaskItem result = await handler.Handle(command, CancellationToken.None);
             Assert.Equal(TaskProgressStatus.InProgress, result.Status);
-            mockDbContext.Verify(c => c.Tasks.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
-            mockDbContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
         [Fact]
         public async Task Handle_ShouldSetTimeCorrectly()
@@ -69,8 +66,8 @@ namespace TestProject
             DateTime after = DateTime.UtcNow;
             Assert.True(result.CreatedAt >= before && result.CreatedAt <= after);
             Assert.True(result.UpdatedAt >= before && result.CreatedAt <= after);
-            mockDbContext.Verify(c => c.Tasks.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
-            mockDbContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

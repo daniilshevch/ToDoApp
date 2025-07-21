@@ -14,14 +14,14 @@ namespace ToDoApp.Application.Tasks.Handlers
 {
     public class GetTaskByIdQueryHandler: IRequestHandler<GetTaskByIdQuery, TaskItem?>
     {
-        private readonly IAppDbContext _context;
-        public GetTaskByIdQueryHandler(IAppDbContext context)
+        private readonly ITaskRepository _repository;
+        public GetTaskByIdQueryHandler(ITaskRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<TaskItem?> Handle(GetTaskByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Tasks.FirstOrDefaultAsync(task => task.Id == request.Id, cancellationToken);
+            return await _repository.GetByIdAsync(request.Id, cancellationToken);
         }
 
     }
