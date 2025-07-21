@@ -29,20 +29,20 @@ namespace ToDoApp.Application.Tasks.Handlers
             }
             task.UpdatedAt = DateTime.UtcNow;
         }
-        private readonly IAppDbContext _context;
-        public UpdateTaskCommandHandler(IAppDbContext context)
+        private readonly ITaskRepository _repository;
+        public UpdateTaskCommandHandler(ITaskRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
         public async Task<TaskItem?> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
         {
-            TaskItem? task = await _context.Tasks.FirstOrDefaultAsync(task => task.Id == request.Id, cancellationToken);
+            TaskItem? task = await _repository.GetByIdAsync(request.Id, cancellationToken);
             if(task is null)
             {
                 return null;
             }
             UpdateTask(task, request);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
             return task;
         }
     }

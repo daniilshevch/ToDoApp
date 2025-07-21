@@ -7,10 +7,10 @@ namespace ToDoApp.Application.Tasks.Handlers;
 
 public class CreateTaskCommandHandler: IRequestHandler<CreateTaskCommand, TaskItem>
 {
-    private readonly IAppDbContext _context;
-    public CreateTaskCommandHandler(IAppDbContext context)
+    private readonly ITaskRepository _repository;
+    public CreateTaskCommandHandler(ITaskRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<TaskItem> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
     {
@@ -23,8 +23,8 @@ public class CreateTaskCommandHandler: IRequestHandler<CreateTaskCommand, TaskIt
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        await _context.Tasks.AddAsync(task);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _repository.AddAsync(task, cancellationToken);
+        await _repository.SaveChangesAsync(cancellationToken);
         return task;
     }
 }
