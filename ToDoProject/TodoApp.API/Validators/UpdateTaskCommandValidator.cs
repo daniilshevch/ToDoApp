@@ -19,7 +19,7 @@ namespace ToDoApp.API.Validators
             });
             When(task => task.Deadline.HasValue, () =>
             {
-                RuleFor(task => task.Deadline!.Value).GreaterThan(DateTime.UtcNow).WithMessage("Deadline must be in the future");
+                RuleFor(task => task.Deadline!.Value).GreaterThanOrEqualTo(DateTime.UtcNow.Date.AddDays(-1)).WithMessage("Deadline must be in the future");
             });
             RuleFor(task => task.Status)
                 .IsInEnum().When(task => task.Status.HasValue)
