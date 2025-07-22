@@ -14,7 +14,7 @@ namespace ToDoApp.API.Validators
                 .MaximumLength(500).WithMessage("Description can't be greater than 500 symbols");
 
 
-            RuleFor(task => task.Deadline).GreaterThan(DateTime.UtcNow).WithMessage("Deadline must be in the future")
+            RuleFor(task => task.Deadline).GreaterThanOrEqualTo(DateTime.UtcNow.Date.AddDays(-1)).WithMessage("Deadline must be in the future")
                 .When(task => task.Deadline.HasValue);
         }
     }
